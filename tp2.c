@@ -80,10 +80,13 @@ void pas_voyelle(FILE* f,char* i)
 	}
 }
 
-int tab(){
-	int T[511];
+int tab(FILE* f,char* i){
+	int T[512];
 	for (int i = 0; i<512; i++) T[i]=i;
-	
+	fclose(f);
+	f = fopen(i,"w+");
+	fwrite(T,sizeof(int),512,f);
+	puts("copie du tableau effectué");
 }
 
 
@@ -101,6 +104,7 @@ int main(int argc, char *argv[])
 
 	// Copy_File(f1,f2,i,j);
 
+	tab(f1,i);
 
     fclose(f1);
 	fclose(f2);
