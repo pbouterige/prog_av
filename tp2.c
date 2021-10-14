@@ -2,6 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+void permutation(char * tab, int * PMU, int N){
+  char * tmp = (char*) malloc(sizeof(char)*N);
+  for (int i = 0; i < N; ++i) {
+    tmp [PMU[i]] = tab[i];
+  }
+  for (int i = 0; i < N; ++i) {
+    tab[i] = tmp[i];
+  }
+  tab = tmp;
+  free(tmp);
+}
+
 
 void Copy_File(FILE* f, FILE* fs,char *i,char *j)
 {
@@ -80,7 +92,7 @@ void pas_voyelle(FILE* f,char* i)
 	}
 }
 
-int tab(FILE* f,char* i){
+void tab(FILE* f,char* i){
 	int T[512];
 	for (int i = 0; i<512; i++) T[i]=i;
 	fclose(f);
@@ -88,6 +100,62 @@ int tab(FILE* f,char* i){
 	fwrite(T,sizeof(int),512,f);
 	puts("copie du tableau effectué");
 }
+
+void code(FILE* f1, char* i, FILE* f2, char* j){
+	int n = 3;
+	int tab[100];
+	char c = (char)getc(f2);
+	int b = 0;
+	while( c != EOF){
+		if (c == ' ' || c == '(' || c == ')' || c == ','){
+			c=getc(f2);
+		}
+		else{
+			tab[b] = atoi(&c);
+			b++;
+			c=getc(f2);
+		}
+	}
+	for (int i = 0 ; i < n ; i++){
+		int a = tab[i];
+		for (int j = 0 ; j< n ; j++){
+			if  (a == tab[j] && j!=i){
+				puts("permutation fausse");
+				return;
+			}
+		}
+	}
+	FILE* fichierSortie = fopen("decalage.txt","w+");
+	char* tabchar = (char*)malloc(sizeof(char)*n);
+	c = getc(f1);
+	int test = 1, seuil;
+	while (c != EOF){
+		for (int j = 0 ; j<n ; j++){
+			tabchar[j] = c;
+			c = getc(f1);
+			if (c == EOF && j != n-1){	
+				seuil = j;
+				j = n;
+				test = 0;
+			}
+		}
+		if (test){	
+			permutation(tabchar,tab,n);
+			for (int k = 0 ; k<n ; k++)
+				putc(tabchar[k],fichierSortie);
+		}
+		else{
+			for (int i = 0 ; i <= seuil ; i++){
+				c = tabchar[i];
+				putc(c,fichierSortie);
+			}
+			c = EOF;
+		}
+	}
+	Copy_File(fichierSortie,f1,"decalage.txt",i);
+	remove("decalage.txt");
+}
+
 
 
 int main(int argc, char *argv[])
@@ -104,7 +172,9 @@ int main(int argc, char *argv[])
 
 	// Copy_File(f1,f2,i,j);
 
-	tab(f1,i);
+	// tab(f1,i);
+
+	code(f1,i,f2,j);
 
     fclose(f1);
 	fclose(f2);
